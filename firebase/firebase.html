@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>firebase</title>
+    <link rel="stylesheet" href="../scroll-bar/jquery.mCustomScrollbar.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="../scroll-bar/jquery.mCustomScrollbar.concat.min.js"></script>
+   
+</head>
+<body>
+    
+    <div>名前<input type="text" id="username"></div>
+    <div>
+      <!-- テキスト入力 -->
+        <textarea id="text" rows="5"></textarea>
+
+          <!-- 日時入力 -->
+        <span id="view_time"></span>
+        <!-- 送信ボタン -->
+        <button id="send">送信</button>
+    </div>  
+    <!-- chat文字をリスト表示 -->
+    
+    <div class="container" >
+      <div id="output" style = "width:300px; height:400px; background-color: skyblue;position:relative; overflow:scroll"></div>
+    </div>
+   <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.14.3/firebase.js"></script>
+
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+
+
+
+
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyDOS7QJZ3FVUVh5JS2wuYRFltPBor723KQ",
+    authDomain: "test-f03d2.firebaseapp.com",
+    databaseURL: "https://test-f03d2.firebaseio.com",
+    projectId: "test-f03d2",
+    storageBucket: "test-f03d2.appspot.com",
+    messagingSenderId: "913458205251",
+    appId: "1:913458205251:web:b923701fa873ad4a20faf6"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  document.getElementById("view_time").innerHTML = getNow();
+
+  
+
+function getNow() {
+	var now = new Date();
+	var year = now.getFullYear();
+	var mon = now.getMonth()+1; 
+  var day = now.getDate();
+	var hour = now.getHours();
+	var min = now.getMinutes();
+	var sec = now.getSeconds();
+  mon = ('0' + mon).slice(-2);
+  day = ('0' + day).slice(-2);
+  hour = ('0' + hour).slice(-2);
+  min = ('0' + min).slice(-2);
+  sec = ('0' + sec).slice(-2);
+
+	//出力用
+	var s = year + "/" + mon + "/" + day + "/" + hour + ":" + min + ":" + sec ; 
+	return s;
+}
+
+
+  var newPostRef = firebase.database().ref();
+
+ //送信処理
+  $("#send").on("click",function(){
+    
+    newPostRef.push({
+        username: $("#username").val(),
+        text: $("#text").val(),
+        time_view: getNow(),
+    });
+    
+  });
+
+  //送信２
+  $("#text").on("keydown", function(e){
+    if(e.keycode ==  13){
+      newPostRef.push({
+        username: $("#username").val(),
+        text: $("#text").val(),
+        time_view: getNow(),
+    }) ;
+    $("#text").val("");
+  }});
+  
+
+  newPostRef.on("child_added", function(data){
+    const v = data.val();
+    const k = data.key;
+    let str = "";
+    str += '<dl>';
+    str += '<dt>'+v.username+'</dt>'
+    str += '<dd>'+v.text+'</dd>'
+    str += '<dd>'+v.time_view+'</dd>'
+    str += '</dl>';
+    $("#output").append(str);
+  });
+
+
+  
+
+  
+
+</script>
+</body>
+</html>
